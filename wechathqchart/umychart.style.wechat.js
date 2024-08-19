@@ -283,6 +283,14 @@ function GetWhiteStyle()
             VolBarColor : "rgb(238,127,9)",
             PriceColor : "rgb(50,171,205)",
             AvPriceColor : "rgb(238,127,9)",
+
+            NightDay:
+            { 
+                NightBGColor:"rgb(22,22,22)",
+                Font:`12px 微软雅黑`,
+                Day: { Color:"rgb(153,153,153)", BGColor:"rgb(51,51,51)", BorderColor:"rgb(51,51,51)", Margin:{ Left:5, Top:2, Bottom:2, Right:5 } },
+                Night: { Color:"rgb(153,153,153)", BGColor:"rgb(51,51,51)", BorderColor:"rgb(51,51,51)", Margin:{ Left:5, Top:2, Bottom:2, Right:5 } },
+            }
         },
 
         DefaultTextColor: "rgb(43,54,69)",
@@ -295,6 +303,18 @@ function GetWhiteStyle()
         DownTextColor: "rgb(25,158,0)",
         UnchagneTextColor: "rgb(0,0,0)",
         CloseLineColor: 'rgb(178,34,34)',
+
+        IndexTitle:
+        {
+            UpDownArrow:    //数值涨跌箭头
+            {
+                UpColor:"rgb(238,21,21)",   //上涨
+                DownColor:"rgb(25,158,0)",  //下跌
+                UnchangeColor:"rgb(190, 190 ,190)"  //不变
+            },
+
+            NameArrow:{ Color:"rgb(190, 190 ,190)", Space:2, Symbol:'▼' },
+        },
 
         FrameBorderPen: "rgb(225,236,242)",     //边框
         FrameSplitPen: "rgb(225,236,242)",          //分割线

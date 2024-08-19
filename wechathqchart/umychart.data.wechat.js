@@ -37,6 +37,18 @@ function IsNumber(value)
     return true;
 }
 
+//深拷贝
+function CloneData(data)
+{
+    if (!data) return null;
+
+    var strData=JSON.stringify(data);
+    var item= JSON.parse(strData);
+    
+    return item;
+}
+
+
 //历史K线数据
 function HistoryData()
 {
@@ -2199,7 +2211,9 @@ var JSCHART_EVENT_ID =
     
     ON_TOUCH_SCROLL_UP_DOWN:108,
 
-    ON_FORMAT_KLINE_HIGH_LOW_TITLE:154,
+    ON_FORMAT_KLINE_HIGH_LOW_TITLE:154,     //K线最高最低价格式化内容
+    ON_CUSTOM_CORSSCURSOR_POSITION:155,     //自定义十字光标X轴的输出的位置
+    ON_CUSTOM_MINUTE_NIGHT_DAY_X_INDEX:156,   //日盘夜盘的分界线
 }
 
 var JSCHART_DATA_FIELD_ID=
@@ -2325,7 +2339,8 @@ export
     JSCHART_DATA_FIELD_ID,
     PhoneDBClick,
     HQ_DATA_TYPE,
-    OVERLAY_STATUS_ID
+    OVERLAY_STATUS_ID,
+    CloneData
 };
 
 /*

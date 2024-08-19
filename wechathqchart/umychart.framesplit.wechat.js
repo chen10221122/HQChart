@@ -266,6 +266,17 @@ function IFrameSplitOperator()
         this.Frame.HorizontalMax=splitData.Max;
         this.Frame.HorizontalMin=splitData.Min;
     }
+
+    this.SendSplitXCoordinateEvent=function()
+    {
+        if (!this.GetEventCallback) return;
+
+        var event=this.GetEventCallback(JSCHART_EVENT_ID.ON_SPLIT_XCOORDINATE);
+        if (!event || !event.Callback) return;
+
+        var data={ ID:this.Frame.Identify, Frame:this.Frame };
+        event.Callback(event,data,this);
+    }
 }
 
 //字符串格式化 千分位分割
@@ -1359,6 +1370,8 @@ function FrameSplitKLineX()
         else if (ChartData.IsMinutePeriod(this.Period, true)) this.SplitDateTime();
         else if (ChartData.IsSecondPeriod(this.Period)) this.SplitSecond();
         else this.SplitDate();
+
+        this.SendSplitXCoordinateEvent();
     }
 
     this.CreateCoordinateInfo=function()
@@ -1549,7 +1562,7 @@ function FrameSplitMinutePriceY()
             var strPrice=price.toFixed(defaultfloatPrecision);  //价格刻度字符串
             if (this.IsShowLeftText) coordinate.Message[0]=strPrice;
 
-            if (this.YClose)
+            if (IFrameSplitOperator.IsNumber(this.YClose) && this.YClose!=0)
             {
                 var per=(price/this.YClose-1)*100;
                 if (per>0) coordinate.TextColor=g_JSChartResource.UpTextColor;
@@ -1629,7 +1642,7 @@ function FrameSplitMinutePriceY()
             coordinate.Value = price;
             coordinate.Message[0] = price.toFixed(defaultfloatPrecision);
 
-            if (IFrameSplitOperator.IsNumber(this.YClose))
+            if (IFrameSplitOperator.IsNumber(this.YClose) && this.YClose!=0)
             {
                 var per = (price / this.YClose - 1) * 100;
                 if (per > 0) coordinate.TextColor = g_JSChartResource.UpTextColor;
@@ -1651,9 +1664,10 @@ function FrameSplitMinutePriceY()
 
     this.CustomCoordinate = function ()    //自定义刻度
     {
+        this.Frame.CustomHorizontalInfo = [];
         if (!this.Custom) return;
 
-        for (var i in this.Custom) 
+        for (var i=0; i<this.Custom.length; ++i) 
         {
             var item = this.Custom[i];
             if (item.Type == 1) 
@@ -1785,6 +1799,8 @@ function FrameSplitMinuteX()
                 this.Frame.VerticalInfo.push(info);
             }
         }
+
+        this.SendSplitXCoordinateEvent();
     }
 }
 
@@ -2198,6 +2214,7 @@ function HQPriceStringFormat()
     {
         this.RText = null;
         this.RComplexText=null;
+        this.PercentageText=null;
         if (IFrameSplitOperator.IsString(this.RValue)) this.RText = this.RValue;
         if (!this.Value) return false;
 
@@ -2232,8 +2249,9 @@ function HQPriceStringFormat()
             var event=this.GetEventCallback(JSCHART_EVENT_ID.ON_FORMAT_CORSSCURSOR_Y_TEXT);
             if (event)
             {
-                var data={ Value:this.Value, FrameID:this.FrameID };
+                var data={ Value:this.Value, FrameID:this.FrameID, PreventDefault:false };
                 event.Callback(event,data,this);
+                if (data.PreventDefault==true) return false;
             }
         }
 
@@ -2282,8 +2300,9 @@ function HQDateStringFormat()
             var event=this.GetEventCallback(JSCHART_EVENT_ID.ON_FORMAT_CORSSCURSOR_X_TEXT);
             if (event)
             {
-                var data={ Item:currentData, Period:this.Data.Period, Date:currentData.Date, Time:currentData.Time,Index:this.Data.DataOffset+index };
+                var data={ Item:currentData, Period:this.Data.Period, Date:currentData.Date, Time:currentData.Time,Index:this.Data.DataOffset+index, PreventDefault:false };
                 event.Callback(event,data,this);
+                if (data.PreventDefault==true) return false;
             }
         }
         return true;
@@ -2325,8 +2344,9 @@ function HQMinuteTimeStringFormat()
         var event=this.GetEventCallback(JSCHART_EVENT_ID.ON_FORMAT_CORSSCURSOR_X_TEXT);
         if (event)
         {
-            var data={ Time:time, Index:showIndex };
+            var data={ Time:time, Index:showIndex, PreventDefault:false };
             event.Callback(event,data,this);
+            if (data.PreventDefault==true) return false;
         }
     }
         return true;

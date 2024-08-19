@@ -26,6 +26,7 @@ import
     JSCHART_EVENT_ID,
     ToFixedPoint,
     ToFixedRect,
+    CloneData,
 } from "./umychart.data.wechat.js";
 
 import 
@@ -49,6 +50,11 @@ import
     g_DivTooltipDataForamt,
 } from './umychart.framesplit.wechat.js'
 
+import 
+{ 
+    g_MinuteTimeStringData
+} from "./umychart.coordinatedata.wechat.js";
+
 
 function IChartFramePainting() 
 {
@@ -66,6 +72,7 @@ function IChartFramePainting()
     this.SizeChange = true;               //大小是否改变
     this.XYSplit = true;                  //XY轴坐标信息改变
     this.XSplit=true;                     //X轴坐标信息改变
+    this.YCustomSplit=true;               //Y轴自定刻度
 
     this.HorizontalMax;                 //Y轴最大值
     this.HorizontalMin;                 //Y轴最小值
@@ -83,6 +90,9 @@ function IChartFramePainting()
     this.IsShowIndexName = true;         //是否显示指标名字
     this.IndexParamSpace = 2;            //指标参数数值显示间距
     this.IndexTitleSpace=0;             //指标标题到参数之间的间距
+
+    this.IsShowTitleArrow=g_JSChartResource.IndexTitle.EnableIndexArrow;        //是否显示指标信息上涨下跌箭头
+    this.TitleArrowType=g_JSChartResource.IndexTitle.ArrowType;             //指标信息上涨下跌箭头类型 0=独立颜色 1=跟指标名字颜色一致
 
     //上锁信息
     this.IsLocked = false;               //是否上锁
@@ -102,6 +112,7 @@ function IChartFramePainting()
         this.SizeChange = false;
         this.XYSplit = false;
         this.XSplit=false;
+        this.YCustomSplit=false;
     }
 
     this.DrawFrame = function () { }
@@ -373,7 +384,7 @@ function AverageWidthFrame()
         var borderRight = this.ChartBorder.Right;
         var borderLeft = this.ChartBorder.Left;
         var titleHeight = this.ChartBorder.TitleHeight;
-        if (borderLeft >= 10) return;
+        if (borderLeft >= 10 && borderRight>=10) return;
         if ((borderLeft < 10 && this.IsShowYText[0] === true) || (borderRight < 10 && this.IsShowYText[1] === true))
         {
             var yPrev = null; //上一个坐标y的值
@@ -1216,12 +1227,15 @@ function MinuteFrame()
     this.MinXDistance = 10;
     this.CustomHorizontalInfo = [];
 
+    this.NightDayConfig=CloneData(g_JSChartResource.Minute.NightDay);
+
+
     this.DrawFrame = function () 
     {
         if (this.IsMinSize) return;
 
         this.SplitXYCoordinate();
-
+        this.DrawNightDayBG();  //绘制夜盘 日盘背景
         this.DrawTitleBG();
         this.DrawHorizontal();
         this.DrawVertical();
@@ -1230,9 +1244,96 @@ function MinuteFrame()
     //分割x,y轴坐标信息
     this.SplitXYCoordinate = function () 
     {
-        if (this.XYSplit == false) return;
+        if (this.XYSplit == false) 
+        {
+            if (this.YCustomSplit)
+            {
+                if (this.YSplitOperator && this.YSplitOperator.CustomCoordinate) this.YSplitOperator.CustomCoordinate();
+            }
+            return;
+        }
+
         if (this.YSplitOperator != null) this.YSplitOperator.Operator();
         if (this.XSplitOperator != null) this.XSplitOperator.Operator();
+    }
+
+    this.DrawNightDayBG=function()
+    {
+        if (this.DayCount!=1) return;
+        if (!this.HQChart) return;
+        if (!this.HQChart.EnableNightDayBG) return;
+
+        var symbol=this.HQChart.Symbol;
+        if (!symbol) return;
+
+        var xIndex=-1;
+        //获取夜盘和日期的分界线X索引位置
+        var event=this.GetEventCallback(JSCHART_EVENT_ID.ON_CUSTOM_MINUTE_NIGHT_DAY_X_INDEX)
+        if (!event || !event.Callback) return;
+
+        var sendData={ Symbol:symbol, XIndex:xIndex, MinuteTimeStringData:g_MinuteTimeStringData };
+        event.Callback(event,sendData,this);
+        xIndex=sendData.XIndex;
+        if (xIndex<0) return;
+
+        var border=this.ChartBorder.GetBorder();
+        var x=this.GetXFromIndex(xIndex);
+
+        var rtNight={ Left: border.Left, Top:border.TopEx, Right:x, Bottom:border.Bottom };
+        rtNight.Width=rtNight.Right-rtNight.Left;
+        rtNight.Height=rtNight.Bottom-rtNight.Top;
+
+        this.Canvas.fillStyle = this.NightDayConfig.NightBGColor;
+        this.Canvas.fillRect(rtNight.Left, rtNight.Top, rtNight.Width, rtNight.Height);
+
+        if (this.Identify!=0) return;
+
+        //显示 日盘夜盘文字
+        this.Canvas.font=this.NightDayConfig.Font;
+		this.Canvas.textBaseline = "bottom";
+		this.Canvas.textAlign = 'left';
+		var aryTitle=[{ Title:"夜盘", Position:1, Config:this.NightDayConfig.Night }, { Title:"日盘", Position:0,Config:this.NightDayConfig.Day }];
+		var textHeight= this.Canvas.measureText("擎").width;
+		for(var i=0;i<aryTitle.length;++i)
+		{
+			var item=aryTitle[i];
+            var text=g_JSChartLocalization.GetText(item.Title,this.HQChart.LanguageID);
+			var testWidth = this.Canvas.measureText(text).width;
+			var rtItem=
+			{ 
+				Width:testWidth+item.Config.Margin.Left+item.Config.Margin.Right, 
+				Height:textHeight+item.Config.Margin.Top+item.Config.Margin.Bottom,
+				Bottom:border.Bottom
+			};
+			rtItem.Top=rtItem.Bottom-rtItem.Height;
+
+			if (item.Position===1) 
+			{
+				rtItem.Right=x-1;
+				rtItem.Left=rtItem.Right-rtItem.Width;
+			}
+			else 
+			{
+				rtItem.Left=x+1;
+				rtItem.Right=rtItem.Left+rtItem.Width;
+			}
+
+			if (item.Config.BGColor)
+			{
+				this.Canvas.fillStyle = item.Config.BGColor;
+				this.Canvas.fillRect(rtItem.Left, rtItem.Top, rtItem.Width, rtItem.Height);
+			}
+
+			if (item.Config.BorderColor)
+			{
+				this.Canvas.strokeStyle = item.Config.BorderColor;
+				this.Canvas.strokeRect(ToFixedPoint(rtItem.Left), ToFixedPoint(rtItem.Top), ToFixedRect(rtItem.Width), ToFixedRect(rtItem.Height));
+			}
+            
+			this.Canvas.fillStyle = item.Config.Color;
+			this.Canvas.fillText(text, rtItem.Left+item.Config.Margin.Left, rtItem.Bottom-item.Config.Margin.Bottom );
+		}
+        
     }
 
     this.GetXFromIndex = function (index) 
@@ -1508,54 +1609,140 @@ function MinuteHScreenFrame()
         }
     }
 
-  //画X轴
-  this.DrawVertical = function () {
-    var left = this.ChartBorder.GetLeft();
-    var right = this.ChartBorder.GetRightEx();
-    var bottom = this.ChartBorder.GetBottom();
+    //画X轴
+    this.DrawVertical = function () 
+    {
+        var left = this.ChartBorder.GetLeft();
+        var right = this.ChartBorder.GetRightEx();
+        var bottom = this.ChartBorder.GetBottom();
 
-    var xPrev = null; //上一个坐标x的值
-    for (var i in this.VerticalInfo) {
-      var x = this.GetXFromIndex(this.VerticalInfo[i].Value);
-      if (x > bottom) break;
-      if (xPrev != null && Math.abs(x - xPrev) < this.MinXDistance) continue;
+        var xPrev = null; //上一个坐标x的值
+        for (var i in this.VerticalInfo) {
+        var x = this.GetXFromIndex(this.VerticalInfo[i].Value);
+        if (x > bottom) break;
+        if (xPrev != null && Math.abs(x - xPrev) < this.MinXDistance) continue;
 
-      this.Canvas.strokeStyle = this.VerticalInfo[i].LineColor;
-      this.Canvas.beginPath();
-      this.Canvas.moveTo(left, ToFixedPoint(x));
-      this.Canvas.lineTo(right, ToFixedPoint(x));
-      this.Canvas.stroke();
+        this.Canvas.strokeStyle = this.VerticalInfo[i].LineColor;
+        this.Canvas.beginPath();
+        this.Canvas.moveTo(left, ToFixedPoint(x));
+        this.Canvas.lineTo(right, ToFixedPoint(x));
+        this.Canvas.stroke();
 
-      if (this.VerticalInfo[i].Message[0] != null) {
-        if (this.VerticalInfo[i].Font != null)
-          this.Canvas.font = this.VerticalInfo[i].Font;
+        if (this.VerticalInfo[i].Message[0] != null) {
+            if (this.VerticalInfo[i].Font != null)
+            this.Canvas.font = this.VerticalInfo[i].Font;
 
-        this.Canvas.fillStyle = this.VerticalInfo[i].TextColor;
-        var testWidth = this.Canvas.measureText(this.VerticalInfo[i].Message[0]).width;
-        if (x < testWidth / 2) {
-          this.Canvas.textAlign = "left";
-          this.Canvas.textBaseline = "top";
+            this.Canvas.fillStyle = this.VerticalInfo[i].TextColor;
+            var testWidth = this.Canvas.measureText(this.VerticalInfo[i].Message[0]).width;
+            if (x < testWidth / 2) {
+            this.Canvas.textAlign = "left";
+            this.Canvas.textBaseline = "top";
+            }
+            else if ((x + testWidth / 2) >= this.ChartBorder.GetChartHeight()) {
+            this.Canvas.textAlign = "right";
+            this.Canvas.textBaseline = "top";
+            }
+            else {
+            this.Canvas.textAlign = "center";
+            this.Canvas.textBaseline = "top";
+            }
+
+            var xText = left, yText = x;
+            this.Canvas.save();
+            this.Canvas.translate(xText, yText);
+            this.Canvas.rotate(90 * Math.PI / 180);
+            this.Canvas.fillText(this.VerticalInfo[i].Message[0], 0, 0);
+            this.Canvas.restore();
         }
-        else if ((x + testWidth / 2) >= this.ChartBorder.GetChartHeight()) {
-          this.Canvas.textAlign = "right";
-          this.Canvas.textBaseline = "top";
-        }
-        else {
-          this.Canvas.textAlign = "center";
-          this.Canvas.textBaseline = "top";
-        }
 
-        var xText = left, yText = x;
-        this.Canvas.save();
-        this.Canvas.translate(xText, yText);
-        this.Canvas.rotate(90 * Math.PI / 180);
-        this.Canvas.fillText(this.VerticalInfo[i].Message[0], 0, 0);
-        this.Canvas.restore();
-      }
-
-      xPrev = x;
+        xPrev = x;
+        }
     }
-  }
+
+    this.DrawNightDayBG=function()
+    {
+        if (this.DayCount!=1) return;
+        if (!this.HQChart) return;
+        if (!this.HQChart.EnableNightDayBG) return;
+
+        var symbol=this.HQChart.Symbol;
+        if (!symbol) return;
+
+        var xIndex=-1;
+        //获取夜盘和日期的分界线X索引位置
+        var event=this.GetEventCallback(JSCHART_EVENT_ID.ON_CUSTOM_MINUTE_NIGHT_DAY_X_INDEX)
+        if (!event || !event.Callback) return;
+
+        var sendData={ Symbol:symbol, XIndex:xIndex, MinuteTimeStringData:g_MinuteTimeStringData };
+        event.Callback(event,sendData,this);
+        xIndex=sendData.XIndex;
+        if (xIndex<0) return;
+
+        var border=this.ChartBorder.GetHScreenBorder();
+        var y=this.GetXFromIndex(xIndex);
+
+        var rtNight={ Left: border.Left, Top:border.Top, Right:border.RightEx, Bottom:y };
+        rtNight.Width=rtNight.Right-rtNight.Left;
+        rtNight.Height=rtNight.Bottom-rtNight.Top;
+
+        this.Canvas.fillStyle = this.NightDayConfig.NightBGColor;
+        this.Canvas.fillRect(rtNight.Left, rtNight.Top, rtNight.Width, rtNight.Height);
+
+        if (this.Identify!=0) return;
+
+        //显示 日盘夜盘文字
+        this.Canvas.font=this.NightDayConfig.Font;
+		this.Canvas.textBaseline = "bottom";
+		this.Canvas.textAlign = 'left';
+		var aryTitle=[{ Title:"夜盘", Position:1, Config:this.NightDayConfig.Night }, { Title:"日盘", Position:0,Config:this.NightDayConfig.Day }];
+		var textHeight= this.Canvas.measureText("擎").width;
+		for(var i=0;i<aryTitle.length;++i)
+		{
+			var item=aryTitle[i];
+            var text=g_JSChartLocalization.GetText(item.Title,this.HQChart.LanguageID);
+			var testWidth = this.Canvas.measureText(text).width;
+			var rtItem=
+			{ 
+				Height:testWidth+item.Config.Margin.Left+item.Config.Margin.Right, 
+				Width:textHeight+item.Config.Margin.Top+item.Config.Margin.Bottom,
+				Left:border.Left
+			};
+			rtItem.Right=rtItem.Left+rtItem.Width;
+
+			if (item.Position===1) 
+			{
+				rtItem.Bottom=y-1;
+				rtItem.Top=rtItem.Bottom-rtItem.Height;
+			}
+			else 
+			{
+				rtItem.Top=y+1;
+				rtItem.Bottom=rtItem.Top+rtItem.Height;
+			}
+
+			if (item.Config.BGColor)
+			{
+				this.Canvas.fillStyle = item.Config.BGColor;
+				this.Canvas.fillRect(rtItem.Left, rtItem.Top, rtItem.Width, rtItem.Height);
+			}
+
+			if (item.Config.BorderColor)
+			{
+				this.Canvas.strokeStyle = item.Config.BorderColor;
+				this.Canvas.strokeRect(ToFixedPoint(rtItem.Left), ToFixedPoint(rtItem.Top), ToFixedRect(rtItem.Width), ToFixedRect(rtItem.Height));
+			}
+
+			this.Canvas.fillStyle = item.Config.Color;
+            var xText=rtItem.Left;
+            var yText=rtItem.Top;
+            this.Canvas.save();
+            this.Canvas.translate(xText,yText);
+            this.Canvas.rotate(90 * Math.PI / 180);
+			this.Canvas.fillText(text, item.Config.Margin.Left, -item.Config.Margin.Bottom);
+            this.Canvas.restore();
+		}
+    }
+
 }
 
 function OverlayMinuteFrame()
@@ -1580,6 +1767,7 @@ function OverlayMinuteFrame()
         this.SizeChange=false;
         this.XYSplit=false;
         this.XSplit=false;
+        this.YCustomSplit=false;
     }
 
     this.GetScaleTextWidth=function()
@@ -2044,6 +2232,10 @@ function KLineFrame()
             if (this.XSplit)
             {
                 if (this.XSplitOperator) this.XSplitOperator.Operator();
+            }
+
+            if (this.YCustomSplit)
+            {
                 if (this.YSplitOperator && this.YSplitOperator.CustomCoordinate) this.YSplitOperator.CustomCoordinate();
             }
             return;

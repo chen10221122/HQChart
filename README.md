@@ -232,6 +232,7 @@ React 例子:[demo-react.md](/教程/demo-react.md) <br>
 ![T型报价](/小程序行情模块用例/image/TReport_demo.gif)  
 * 大数据表格
 ![大数据表格](/小程序行情模块用例/image/report_bigdata_demo.gif)  
+![大宗交易](/小程序行情模块用例/image/report_block_trade_demo.png)   
 
 
 
@@ -295,6 +296,10 @@ React 例子:[demo-react.md](/教程/demo-react.md) <br>
 
 ## T型报价
 * [T型报价](https://jones2000.github.io/HQChart/webhqchart.demo/samples/demo_TReport.html)  
+
+## 报价列表
+* [报价列表](https://jones2000.github.io/HQChart/webhqchart.demo/samples/demo_report.html)  
+* [大宗交易列表](https://jones2000.github.io/HQChart/webhqchart.demo/samples/demo_report_block_trade.html)  
 
 
 
@@ -573,14 +578,18 @@ React 例子:[demo-react.md](/教程/demo-react.md) <br>
 14. [HQChart实战教程69-分时图主图如何设置指标](https://jones2000.blog.csdn.net/article/details/136160187)   
 15. [HQChart实战教程70-K线图增加成本线](https://jones2000.blog.csdn.net/article/details/136687070)   
 16. [HQChart实战教程72-美股盘前,盘中,盘后分时图](https://blog.csdn.net/jones2000/article/details/138870447)   
+17. [HQChart实战教程74-自定义指标标题栏](https://jones2000.blog.csdn.net/article/details/140488167)  
+18. [HQChart实战教程75-分时图回放](https://blog.csdn.net/jones2000/article/details/140682155)   
+19. [HQChart实战教程76-自定义Y轴刻度线](https://jones2000.blog.csdn.net/article/details/140949881)    
 
 ## HQChart报价列表高级应用教程(付费文章)
-1. [HQChart报价列表高级应用教程1-雪球数据对接报价列表](https://blog.csdn.net/jones2000/article/details/124759574)<br>
-2. [HQChart报价列表高级应用教程2-东方财富数据对接自选股列表](https://blog.csdn.net/jones2000/article/details/124940054)<br>
+1. [HQChart报价列表高级应用教程1-雪球数据对接报价列表](https://blog.csdn.net/jones2000/article/details/124759574)   
+2. [HQChart报价列表高级应用教程2-东方财富数据对接自选股列表](https://blog.csdn.net/jones2000/article/details/124940054)   
 3. [HQChart报价列表高级应用教程3-雪球数据对接报价列表uniapp版本](https://blog.csdn.net/jones2000/article/details/128637380)    
 4. [HQChart报价列表高级应用教程4-股票名称增加类型图标](https://blog.csdn.net/jones2000/article/details/128692571)    
 5. [HQChart报价列表高级应用教程5-自定义单元格文字颜色](https://jones2000.blog.csdn.net/article/details/129665704)  
-5. [HQChart报价列表高级应用教程5-自定义列数据对接](https://jones2000.blog.csdn.net/article/details/129678481)  
+6. [HQChart报价列表高级应用教程6-自定义列数据对接](https://jones2000.blog.csdn.net/article/details/129678481)  
+7. [HQChart报价列表高级应用教程7-走势列数据对接](https://blog.csdn.net/jones2000/article/details/140163584)   
 
 
 ## 设计文档:

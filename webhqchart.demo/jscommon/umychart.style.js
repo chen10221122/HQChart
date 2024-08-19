@@ -81,7 +81,20 @@ function GetBlackStyle()
             {
                 BGColor:"rgba(105,105,105,0.5)",
                 AvPriceColor:'rgb(248,248,255)'     //均线
+            },
+            NightDay:
+            { 
+                NightBGColor:"rgb(22,22,22)",
+                Font:`${12*GetDevicePixelRatio()}px 微软雅黑`,
+                Day: { Color:"rgb(153,153,153)", BGColor:"rgb(51,51,51)", BorderColor:"rgb(51,51,51)", Margin:{ Left:5, Top:2, Bottom:2, Right:5 } },
+                Night: { Color:"rgb(153,153,153)", BGColor:"rgb(51,51,51)", BorderColor:"rgb(51,51,51)", Margin:{ Left:5, Top:2, Bottom:2, Right:5 } },
             }
+        },
+
+        PopMinuteChart:
+        {
+            BGColor:"rgba(0,0,0,0.95)",
+            BorderColor:"rgb(230,230,230)",
         },
     
     
@@ -105,7 +118,9 @@ function GetBlackStyle()
                 UpColor:"rgb(238,21,21)",   //上涨
                 DownColor:"rgb(25,158,0)",  //下跌
                 UnchangeColor:"rgb(190, 190 ,190)"  //不变
-            }
+            },
+
+            NameArrow:{ Color:"rgb(190, 190 ,190)", Space:2, Symbol:'▼' },
         },
     
         Title:
@@ -526,13 +541,13 @@ function GetBlackStyle()
             {
                 Color:"RGB(245,245,245)",
                 SortColor:"rgb(255,0,0)",
-                Mergin:{ Left:5, Right:5, Top:4, Bottom:2 },
+                //Mergin:{ Left:5, Right:5, Top:4, Bottom:2 },
                 Font:{ Size:12, Name:"微软雅黑" }
             },
     
             Item:
             {
-                Mergin:{ Top:2, Bottom:0,Left:5, Right:5 },
+                Mergin:{ Top:2, Bottom:4,Left:5, Right:5 },
                 Font:{ Size:15, Name:"微软雅黑"},
                 BarMergin:{ Top:2, Left:3, Right:3, Bottom:2 },
                 NameFont:{ Size:14, Name:"微软雅黑" },
@@ -592,7 +607,7 @@ function GetBlackStyle()
     
                 TabTitleColor:'rgb(153,153,153)',
                 TabSelectedTitleColor:'rgb(255,255,255)',
-                TabSelectedBGColor:"rgb(13,12,15)",
+                TabSelectedBGColor:"rgb(234,85,4)",
                 TabMoveOnTitleColor:"rgb(255,255,255)",
                 TabBGColor:"rgb(28,28,31)"
             },
@@ -622,6 +637,34 @@ function GetBlackStyle()
                 BarColor:"rgba(48,48,48,0.9)",
                 BorderColor:'rgba(48,48,48,0.9)',
                 BGColor:"rgba(211,211,211,0.5)",
+            },
+
+            CheckBox:
+            {
+                Family:"iconfont", Size:15,
+                Checked:{ Color:"rgb(69,147,238)", Symbol:"\ue6b3", DisableColor:"rgb(120,120,120)", MouseOnColor:"rgb(69,147,238)" },
+                Unchecked:{ Color:"rgb(210,210,210)", Symbol:"\ue6b4", DisableColor:"rgb(120,120,120)", MouseOnColor:"rgb(69,147,238)" },
+            },
+
+            Link:
+            {
+                Font:`${12*GetDevicePixelRatio()}px 微软雅黑`,
+                TextColor:"rgb(0,144,255)",
+
+                Disable:{ TextColor:"rgb(211,211,211)" },
+                MouseOn:{ TextColor:"rgb(0,144,255)" },
+            },
+
+            ProgressBar:
+            {
+                BGColor:"rgb(20,24,28)",
+                BarColor:"rgb(47,124,197)",
+                Margin:{ Left:2, Right:2, Bottom:2, Top:2 },
+                BarMargin:{ Left:2, Right:2, Bottom:2, Top:2 },
+                TextColor:"rgb(230,230,230)",
+                Font:`${12*GetDevicePixelRatio()}px 微软雅黑`,
+                TextMargin:{ Left:40, Right:2, Bottom:2, Top:2},
+                Disable:{ BGColor:"rgb(61,61,61)", BarColor:"rgb(131,131,131)", TextColor:"rgb(159,161,159)"}
             }
         },
 

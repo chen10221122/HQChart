@@ -39,13 +39,16 @@ function JSDialogDrawTool()
                 { Title: '标价线', ClassName: 'hqchart_drawtool icon-price_line', Type:0, Data:{ ID:"标价线" } },
                 { Title: '垂直线', ClassName: 'hqchart_drawtool icon-vertical_line', Type:0, Data:{ ID:"垂直线" } },
                 { Title: '十字线', ClassName: 'hqchart_drawtool icon-tubiao_shizixian', Type:0, Data:{ ID:"十字线" } },
-                { Title: '箭头', ClassName: 'hqchart_drawtool icon-draw_rays', Type:0, Data:{ ID:"箭头" } },
+                { Title: '箭头', ClassName: 'hqchart_drawtool icon-bottom-arrow-solid', Type:0, Data:{ ID:"箭头" } },
+                { Title: '大箭头', ClassName: 'hqchart_drawtool icon-big_arrow', Type:0, Data:{ ID:"ArrowMarker" } },
                 { Title: '趋势线', ClassName: 'hqchart_drawtool icon-draw_trendline', Type:0, Data:{ ID:"趋势线" } },
                 { Title: '水平线', ClassName: 'hqchart_drawtool icon-draw_hline', Type:0, Data:{ ID:"水平线" } },
                 { Title: '水平射线', ClassName: 'hqchart_drawtool icon-tubiao_shuipingshexian', Type:0, Data:{ ID:"水平射线" } },
                 { Title: '涂鸦线段', ClassName: 'hqchart_drawtool icon-draw_line', Type:0, Data:{ ID:"涂鸦线段" } },
                 { Title: '阻速线', ClassName: 'hqchart_drawtool icon-draw_resline', Type:0, Data:{ ID:"阻速线" } },
+                { Title: '通达信阻速线', ClassName: 'hqchart_drawtool icon-draw_resline', Type:0, Data:{ ID:"阻速线2" } },
                 { Title: '江恩角度线', ClassName: 'hqchart_drawtool icon-jiangenjiaoduxian', Type:0, Data:{ ID:"江恩角度线" } },
+                { Title: '通达信江恩角度线', ClassName: 'hqchart_drawtool icon-jiangenjiaoduxian', Type:0, Data:{ ID:"江恩角度线2" } },
             ]
         }, 
         {
@@ -109,6 +112,7 @@ function JSDialogDrawTool()
             [
                 { Title: '价格范围', ClassName: 'hqchart_drawtool icon-shijianfanwei', Type:0, Data:{ ID:"PriceRange" }  },
                 { Title: '时间范围', ClassName: 'hqchart_drawtool icon-jiagefanwei', Type:0, Data:{ ID:"DateRange" }  },
+                { Title: "价格和时间范围", ClassName:"hqchart_drawtool icon-jiagefanwei", Type:0, Data:{ ID:"DatePriceRange" } },
                 { Title: "监测线", ClassName:"hqchart_drawtool icon-jiance", Type:0, Data:{ ID:"MonitorLine"} },
             ]
         },
@@ -212,7 +216,7 @@ function JSDialogDrawTool()
     this.Destroy=function()
     {
         this.AryDivChart=[];
-        document.body.remove(this.DivDialog);
+        if (this.DivDialog) document.body.removeChild(this.DivDialog);
         this.DivDialog=null;
     }
 
